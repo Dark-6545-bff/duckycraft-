@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DuckyCraft - Minecraft Mod & Oyun Portalı</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #334155;
+            --primary: #84cc16;
+            --primary-hover: #65a30d;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --danger: #ef4444;
+            --accent: #38bdf8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            padding-bottom: 50px;
+        }
+
+        header {
+            background-color: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 2px solid var(--primary);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+        }
+
+        .active-user-badge {
+            font-weight: bold;
+            font-size: 0.95rem;
+            color: var(--accent);
+            background: var(--bg-card);
+            padding: 5px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--bg-input);
+        }
+
+        .accounts-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 45px;
+            background: var(--bg-card);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            width: 220px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            z-index: 200;
+            overflow: hidden;
+        }
+
+        .accounts-dropdown.active {
+            display: block;
+        }
+
+        .account-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .account-item:hover {
+            background: var(--bg-input);
+        }
+
+        .account-item.current {
+            background: rgba(132, 204, 22, 0.15);
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: #000;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-input);
+            color: var(--text-main);
+        }
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        .controls-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        @media(min-width: 600px) {
+            .controls-bar {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px 12px 40px;
+            border-radius: 8px;
+            border: 1px solid var(--bg-input);
+            background-color: var(--bg-card);
+            color: var(--text-main);
+            font-size: 1rem;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .filters {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .filter-btn {
+            background-color: var(--bg-card);
+            color: var(--text-muted);
+            border: 1px solid var(--bg-input);
+            padding: 8px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary);
+            color: #000;
+            border-color: var(--primary);
+            font-weight: bold;
+        }
+
+        .admin-panel {
+            background-color: var(--bg-card);
+            border: 2px dashed var(--primary);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .admin-panel.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--bg-input);
+            background-color: var(--bg-input);
+            color: var(--text-main);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .link-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media(min-width: 640px) {
+            .grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .slider-container {
+            position: relative;
+            height: 180px;
+            background-color: #000;
+            overflow: hidden;
+        }
+
+        .slider-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .slider-img.active {
+            display: block;
+        }
+
+        .slider-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        .slider-prev { left: 8px; }
+        .slider-next { right: 8px; }
+
+        .card-body {
+            padding: 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            color: var(--text-main);
+        }
+
+        .badges {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .badge-mc { background: rgba(56, 189, 248, 0.2); color: var(--accent); }
+        .badge-size { background: rgba(148, 163, 184, 0.2); color: var(--text-muted); }
+
+        .card-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            flex: 1;
+        }
+
+        .download-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .dl-btn {
+            background-color: var(--bg-input);
+            color: var(--text-main);
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .dl-btn:hover {
+            background-color: var(--primary);
+            color: #000;
+        }
+
+        .rating-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 10px;
+            margin-top: auto;
+        }
+
+        .stars { color: #f59e0b; }
+
+        .comments-section {
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
+
+        .comment-item {
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 4px 0;
+            color: var(--text-muted);
+        }
+
+        .delete-card-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            background: var(--danger);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-muted);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid var(--primary);
+        }
+
+        /* Chat & Messaging Styles */
+        .chat-section {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 20px;
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            height: 400px;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--bg-input);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .chat-rooms {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            margin-bottom: 10px;
+        }
+
+        .room-tab {
+            background: var(--bg-input);
+            color: var(--text-muted);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .room-tab.active {
+            background: var(--primary);
+            color: #000;
+            font-weight: bold;
+        }
+
+        .chat-messages {
+            flex: 1;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 10px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .chat-msg {
+            font-size: 0.9rem;
+            background: var(--bg-input);
+            padding: 8px 12px;
+            border-radius: 6px;
+            max-width: 80%;
+            word-break: break-word;
+        }
+
+        .chat-msg.mine {
+            background: rgba(132, 204, 22, 0.2);
+            align-self: flex-end;
+            border-left: 3px solid var(--primary);
+        }
+
+        .chat-msg .author {
+            font-weight: bold;
+            color: var(--accent);
+            font-size: 0.8rem;
+            margin-bottom: 2px;
+            display: block;
+            cursor: pointer;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <i class="fa-solid fa-cube"></i> DuckyCraft
+        </div>
+        <div class="user-section">
+            <span id="activeUserBadge" class="active-user-badge" style="display: none;">Misafir</span>
+            <div style="position: relative;">
+                <button id="accountMenuBtn" class="btn btn-secondary">
+                    <i class="fa-solid fa-users"></i> Hesaplar <i class="fa-solid fa-caret-down"></i>
+                </button>
+                <div id="accountsDropdown" class="accounts-dropdown">
+                    <div id="accountsListContainer"></div>
+                    <div class="account-item" id="openLoginModalBtn" style="color: var(--primary); font-weight: bold; justify-content: center;">
+                        <i class="fa-solid fa-user-plus"></i> + Yeni Hesap Ekle
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- Controls (Search & Filter) -->
+        <div class="controls-bar">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" placeholder="Mod veya oyun ara...">
+            </div>
+            <div class="filters">
+                <button class="filter-btn active" data-cat="all">Hepsini Göster</button>
+                <button class="filter-btn" data-cat="mod">Modlar</button>
+                <button class="filter-btn" data-cat="game">Oyunlar</button>
+                <button class="filter-btn" data-cat="addon">Eklentiler</button>
+            </div>
+        </div>
+
+        <!-- Admin Form Panel -->
+        <div id="adminPanel" class="admin-panel">
+            <h3 style="margin-bottom: 15px; color: var(--primary);">Yeni İçerik Paylaş 👑</h3>
+            <form id="addContentForm">
+                <div class="form-row">
+                    <div class="form-group" style="flex:2;">
+                        <label>Başlık</label>
+                        <input type="text" id="itemTitle" class="form-control" required placeholder="Örn: Gun Mod v2">
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label>Kategori</label>
+                        <select id="itemCategory" class="form-control">
+                            <option value="mod">Mod</option>
+                            <option value="game">Oyun</option>
+                            <option value="addon">Eklenti</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group" style="flex:1;">
+                        <label>MC Sürümü</label>
+                        <input type="text" id="itemVersion" class="form-control" placeholder="Örn: 1.20.1">
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label>Dosya Boyutu</label>
+                        <input type="text" id="itemSize" class="form-control" placeholder="Örn: 14 MB">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Açıklama</label>
+                    <textarea id="itemDesc" class="form-control" rows="3" required placeholder="Mod detaylarını yazın..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Galeriden Resimler Seç</label>
+                    <input type="file" id="itemImages" class="form-control" accept="image/*" multiple required>
+                </div>
+
+                <div class="form-group">
+                    <label>İndirme Bağlantıları (GoFile.io vb.)</label>
+                    <div id="linksContainer">
+                        <div class="link-input-group">
+                            <input type="text" placeholder="Etiket (Örn: GoFile İndir)" class="form-control link-label" required>
+                            <input type="url" placeholder="https://gofile.io/d/..." class="form-control link-url" required>
+                        </div>
+                    </div>
+                    <button type="button" id="addLinkBtn" class="btn btn-secondary" style="margin-top: 5px; font-size: 0.8rem;">+ Bağlantı Ekle</button>
+                </div>
+
+                <button type="submit" class="btn" style="width: 100%; justify-content: center;">Yayınla</button>
+            </form>
+        </div>
+
+        <!-- Content Grid -->
+        <div id="contentGrid" class="grid"></div>
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <i class="fa-solid fa-box-open" style="font-size: 3rem; margin-bottom: 10px;"></i>
+            <p>Henüz içerik eklenmedi veya arama sonucu bulunamadı.</p>
+        </div>
+
+        <!-- DuckyChat Section -->
+        <div class="chat-section">
+            <div class="chat-header">
+                <h3 style="color: var(--primary);"><i class="fa-solid fa-comments"></i> DuckyChat</h3>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 4px 8px;" onclick="createNewRoom()">+ Oda Kur</button>
+                </div>
+            </div>
+
+            <div id="chatRoomsContainer" class="chat-rooms">
+                <button class="room-tab active" onclick="switchRoom('Genel')"># Genel</button>
+            </div>
+
+            <div id="chatMessages" class="chat-messages"></div>
+
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" class="form-control" placeholder="Mesaj yaz..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+                <button class="btn" onclick="sendChatMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 15px;">Yeni Hesap Ekle</h3>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Kullanıcı Adı</label>
+                    <input type="text" id="loginName" class="form-control" required placeholder="Adınız">
+                </div>
+                <div class="form-group">
+                    <label>E-Posta</label>
+                    <input type="email" id="loginEmail" class="form-control" required placeholder="örnek@mail.com">
+                </div>
+                <div class="form-group">
+                    <label>Şifre</label>
+                    <input type="password" id="loginPassword" class="form-control" required placeholder="••••••••">
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" id="closeModalBtn" class="btn btn-secondary">İptal</button>
+                    <button type="submit" class="btn">Hesap Ekle</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        // Data State
+        let items = JSON.parse(localStorage.getItem('duckycraft_items')) || [];
+        let accounts = JSON.parse(localStorage.getItem('duckycraft_accounts')) || [];
+        let currentAccountId = localStorage.getItem('duckycraft_active_account') || null;
+        let currentFilter = 'all';
+
+        let chatMessages = JSON.parse(localStorage.getItem('duckycraft_chat')) || [
+            { id: 1, room: 'Genel', author: 'DuckyDuck 👑', text: 'DuckyCraft sohbet odasına hoş geldiniz!' }
+        ];
+        let currentRoom = 'Genel';
+        let chatRooms = JSON.parse(localStorage.getItem('duckycraft_rooms')) || ['Genel', 'Mod-Destek', 'Oyunlar'];
+
+        // DOM Elements
+        const accountMenuBtn = document.getElementById('accountMenuBtn');
+        const accountsDropdown = document.getElementById('accountsDropdown');
+        const accountsListContainer = document.getElementById('accountsListContainer');
+        const openLoginModalBtn = document.getElementById('openLoginModalBtn');
+        const activeUserBadge = document.getElementById('activeUserBadge');
+        const adminPanel = document.getElementById('adminPanel');
+        const loginModal = document.getElementById('loginModal');
+        const loginForm = document.getElementById('loginForm');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const addContentForm = document.getElementById('addContentForm');
+        const addLinkBtn = document.getElementById('addLinkBtn');
+        const linksContainer = document.getElementById('linksContainer');
+        const contentGrid = document.getElementById('contentGrid');
+        const emptyState = document.getElementById('emptyState');
+        const searchInput = document.getElementById('searchInput');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+
+        function cleanEmojis(text) {
+            return text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
+        }
+
+        accountMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            accountsDropdown.classList.toggle('active');
+            renderAccountsList();
+        });
+
+        window.addEventListener('click', () => {
+            accountsDropdown.classList.remove('active');
+        });
+
+        openLoginModalBtn.addEventListener('click', () => {
+            accountsDropdown.classList.remove('active');
+            loginModal.style.display = 'flex';
+        });
+
+        closeModalBtn.addEventListener('click', () => loginModal.style.display = 'none');
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            let name = document.getElementById('loginName').value.trim();
+            const email = document.getElementById('loginEmail').value.trim();
+            const pass = document.getElementById('loginPassword').value.trim();
+
+            let isAdmin = false;
+            let finalName = "";
+
+            if (name === 'DuckyDuck' && email === 'admin@duckycraft.com' && pass === 'admin1234') {
+                isAdmin = true;
+                finalName = 'DuckyDuck 👑';
+            } else {
+                let safeName = cleanEmojis(name);
+                if (!safeName) safeName = "Oyuncu";
+                finalName = safeName;
+            }
+
+            const newAcc = {
+                id: Date.now().toString(),
+                name: finalName,
+                isAdmin: isAdmin
+            };
+
+            accounts.push(newAcc);
+            currentAccountId = newAcc.id;
+            saveAccountsState();
+            
+            loginModal.style.display = 'none';
+            loginForm.reset();
+            updateUIState();
+        });
+
+        function saveAccountsState() {
+            localStorage.setItem('duckycraft_accounts', JSON.stringify(accounts));
+            localStorage.setItem('duckycraft_active_account', currentAccountId || '');
+        }
+
+        function switchAccount(id) {
+            currentAccountId = id;
+            saveAccountsState();
+            updateUIState();
+        }
+
+        function deleteAccount(id, e) {
+            e.stopPropagation();
+            accounts = accounts.filter(acc => acc.id !== id);
+            if (currentAccountId === id) {
+                currentAccountId = accounts.length > 0 ? accounts[0].id : null;
+            }
+            saveAccountsState();
+            updateUIState();
+        }
+
+        function getCurrentAccount() {
+            return accounts.find(acc => acc.id === currentAccountId) || null;
+        }
+
+        function updateUIState() {
+            const currentAcc = getCurrentAccount();
+            if (currentAcc) {
+                activeUserBadge.style.display = 'inline-block';
+                activeUserBadge.innerHTML = currentAcc.name;
+                if (currentAcc.isAdmin) {
+                    adminPanel.classList.add('active');
+                } else {
+                    adminPanel.classList.remove('active');
+                }
+            } else {
+                activeUserBadge.style.display = 'none';
+                adminPanel.classList.remove('active');
+            }
+            renderItems();
+        }
+
+        function renderAccountsList() {
+            accountsListContainer.innerHTML = '';
+            if (accounts.length === 0) {
+                accountsListContainer.innerHTML = `<div style="padding: 10px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">Kayıtlı hesap yok</div>`;
+                return;
+            }
+
+            accounts.forEach(acc => {
+                const div = document.createElement('div');
+                div.className = `account-item ${acc.id === currentAccountId ? 'current' : ''}`;
+                div.innerHTML = `
+                    <span>${acc.name}</span>
+                    <i class="fa-solid fa-trash" style="color: var(--danger); cursor: pointer;" onclick="deleteAccount('${acc.id}', event)"></i>
+                `;
+                div.onclick = () => switchAccount(acc.id);
+                accountsListContainer.appendChild(div);
+            });
+        }
+
+        addLinkBtn.addEventListener('click', () => {
+            const div = document.createElement('div');
+            div.className = 'link-input-group';
+            div.innerHTML = `
+                <input type="text" placeholder="Etiket (Örn: GoFile)" class="form-control link-label" required>
+                <input type="url" placeholder="Link" class="form-control link-url" required>
+            `;
+            linksContainer.appendChild(div);
+        });
+
+        const fileToBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+
+        addContentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const files = Array.from(document.getElementById('itemImages').files);
+            const base64Images = await Promise.all(files.map(file => fileToBase64(file)));
+
+            const linkLabels = Array.from(document.querySelectorAll('.link-label')).map(i => i.value);
+            const linkUrls = Array.from(document.querySelectorAll('.link-url')).map(i => i.value);
+            const links = linkLabels.map((label, idx) => ({ label, url: linkUrls[idx] }));
+
+            const newItem = {
+                id: Date.now(),
+                title: document.getElementById('itemTitle').value,
+                category: document.getElementById('itemCategory').value,
+                version: document.getElementById('itemVersion').value || 'Evrensel',
+                size: document.getElementById('itemSize').value || 'Bilinmiyor',
+                desc: document.getElementById('itemDesc').value,
+                images: base64Images,
+                links: links,
+                downloads: 0,
+                rating: 5,
+                comments: []
+            };
+
+            items.unshift(newItem);
+            saveAndRenderItems();
+            addContentForm.reset();
+            linksContainer.innerHTML = `
+                <div class="link-input-group">
+                    <input type="text" placeholder="Etiket (Örn: GoFile İndir)" class="form-control link-label" required>
+                    <input type="url" placeholder="https://gofile.io/d/..." class="form-control link-url" required>
+                </div>
+            `;
+        });
+
+        function saveAndRenderItems() {
+            localStorage.setItem('duckycraft_items', JSON.stringify(items));
+            renderItems();
+        }
+
+        function deleteItem(id) {
+            if (confirm('Bu içeriği silmek istediğine emin misin?')) {
+                items = items.filter(i => i.id !== id);
+                saveAndRenderItems();
+            }
+        }
+
+        function registerDownload(itemId) {
+            const item = items.find(i => i.id === itemId);
+            if(item) {
+                item.downloads++;
+                saveAndRenderItems();
+            }
+        }
+
+        function addComment(itemId, text) {
+            if(!text.trim()) return;
+            const item = items.find(i => i.id === itemId);
+            const currentAcc = getCurrentAccount();
+            if(item) {
+                let author = currentAcc ? currentAcc.name : 'Misafir';
+                item.comments.push(`${author}: ${text}`);
+                saveAndRenderItems();
+            }
+        }
+
+        // Chat Functions
+        function switchRoom(roomName) {
+            currentRoom = roomName;
+            renderChatRooms();
+            renderChatMessages();
+        }
+
+        function createNewRoom() {
+            let roomName = prompt("Yeni oda adını girin:");
+            if(roomName && roomName.trim() !== "") {
+                roomName = roomName.trim().replace(/\s+/g, '-');
+                if(!chatRooms.includes(roomName)) {
+                    chatRooms.push(roomName);
+                    localStorage.setItem('duckycraft_rooms', JSON.stringify(chatRooms));
+                    switchRoom(roomName);
+                } else {
+                    alert("Bu oda zaten var!");
+                }
+            }
+        }
+
+        window.startPrivateChat = function(targetUser) {
+            let privateRoomName = `Özel: ${targetUser}`;
+            if(!chatRooms.includes(privateRoomName)) {
+                chatRooms.push(privateRoomName);
+                localStorage.setItem('duckycraft_rooms', JSON.stringify(chatRooms));
+            }
+            switchRoom(privateRoomName);
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if(!text) return;
+
+            const currentAcc = getCurrentAccount();
+            const authorName = currentAcc ? currentAcc.name : 'Misafir (Hesapsız)';
+
+            const newMsg = {
+                id: Date.now(),
+                room: currentRoom,
+                author: authorName,
+                text: text
+            };
+
+            chatMessages.push(newMsg);
+            localStorage.setItem('duckycraft_chat', JSON.stringify(chatMessages));
+            input.value = '';
+            renderChatMessages();
+        }
+
+        function renderChatRooms() {
+            const container = document.getElementById('chatRoomsContainer');
+            container.innerHTML = '';
+            chatRooms.forEach(room => {
+                const btn = document.createElement('button');
+                btn.className = `room-tab ${room === currentRoom ? 'active' : ''}`;
+                btn.innerHTML = room.startsWith('Özel:') ? `<i class="fa-solid fa-lock"></i> ${room}` : `# ${room}`;
+                btn.onclick = () => switchRoom(room);
+                container.appendChild(btn);
+            });
+        }
+
+        function renderChatMessages() {
+            const container = document.getElementById('chatMessages');
+            container.innerHTML = '';
+
+            const filteredMsgs = chatMessages.filter(m => m.room === currentRoom);
+
+            if(filteredMsgs.length === 0) {
+                container.innerHTML = `<div style="text-align:center; color: var(--text-muted); font-size:0.85rem; margin-top:auto; margin-bottom:auto;">Bu odada henüz mesaj yok. İlk mesajı sen yaz!</div>`;
+                return;
+            }
+
+            const currentAcc = getCurrentAccount();
+            const myName = currentAcc ? currentAcc.name : 'Misafir (Hesapsız)';
+
+            filteredMsgs.forEach(msg => {
+                const div = document.createElement('div');
+                const isMine = msg.author === myName;
+                div.className = `chat-msg ${isMine ? 'mine' : ''}`;
+                
+                div.innerHTML = `
+                    <span class="author" onclick="startPrivateChat('${msg.author.replace(/ 👑/g, '')}')">${msg.author}</span>
+                    <span>${msg.text}</span>
+                `;
+                container.appendChild(div);
+            });
+
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function renderItems() {
+            contentGrid.innerHTML = '';
+            const searchQ = searchInput.value.toLowerCase();
+            const currentAcc = getCurrentAccount();
+            const isUserAdmin = currentAcc ? currentAcc.isAdmin : false;
+
+            const filtered = items.filter(item => {
+                const matchesCat = currentFilter === 'all' || item.category === currentFilter;
+                const matchesSearch = item.title.toLowerCase().includes(searchQ) || item.desc.toLowerCase().includes(searchQ);
+                return matchesCat && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            } else {
+                emptyState.style.display = 'none';
+            }
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+
+                let imagesHTML = item.images.map((img, idx) => 
+                    `<img src="${img}" class="slider-img ${idx === 0 ? 'active' : ''}" data-idx="${idx}">`
+                ).join('');
+
+                let sliderNav = item.images.length > 1 ? `
+                    <button class="slider-btn slider-prev" onclick="moveSlider(${item.id}, -1)"><i class="fa-solid fa-chevron-left"></i></button>
+                    <button class="slider-btn slider-next" onclick="moveSlider(${item.id}, 1)"><i class="fa-solid fa-chevron-right"></i></button>
+                ` : '';
+
+                let linksHTML = item.links.map(l => `
+                    <a href="${l.url}" target="_blank" class="dl-btn" onclick="registerDownload(${item.id})">
+                        <span><i class="fa-solid fa-download"></i> ${l.label}</span>
+                        <i class="fa-solid fa-external-link"></i>
+                    </a>
+                `).join('');
+
+                let commentsHTML = item.comments.map(c => `<div class="comment-item">${c}</div>`).join('');
+
+                card.innerHTML = `
+                    ${isUserAdmin ? `<button class="delete-card-btn" style="display:block" onclick="deleteItem(${item.id})"><i class="fa-solid fa-trash"></i></button>` : ''}
+                    <div class="slider-container" id="slider-${item.id}">
+                        ${imagesHTML}
+                        ${sliderNav}
+                    </div>
+                    <div class="card-body">
+                        <div class="card-header-info">
+                            <h3 class="card-title">${item.title}</h3>
+                        </div>
+                        <div class="badges">
+                            <span class="badge badge-mc">MC ${item.version}</span>
+                            <span class="badge badge-size">${item.size}</span>
+                            <span class="badge badge-size"><i class="fa-solid fa-download"></i> ${item.downloads} İndirme</span>
+                        </div>
+                        <p class="card-desc">${item.desc}</p>
+                        
+                        <div class="download-links">
+                            ${linksHTML}
+                        </div>
+
+                        <div class="rating-box">
+                            <div class="stars">★★★★★</div>
+                            <span style="font-size:0.8rem; color:var(--text-muted);">${item.rating}.0</span>
+                        </div>
+
+                        <div class="comments-section">
+                            <div style="font-weight:bold; margin-bottom:5px;">Yorumlar (${item.comments.length})</div>
+                            <div id="comments-list-${item.id}">${commentsHTML}</div>
+                            <input type="text" placeholder="Yorum yaz ve Enter'a bas..." class="form-control" style="margin-top:8px; font-size:0.8rem;" onkeypress="if(event.key==='Enter'){addComment(${item.id}, this.value)}">
+                        </div>
+                    </div>
+                `;
+
+                contentGrid.appendChild(card);
+            });
+        }
+
+        window.moveSlider = function(itemId, direction) {
+            const container = document.getElementById(`slider-${itemId}`);
+            const imgs = container.querySelectorAll('.slider-img');
+            let activeIdx = Array.from(imgs).findIndex(img => img.classList.contains('active'));
+            
+            imgs[activeIdx].classList.remove('active');
+            let nextIdx = activeIdx + direction;
+            if (nextIdx >= imgs.length) nextIdx = 0;
+            if (nextIdx < 0) nextIdx = imgs.length - 1;
+            
+            imgs[nextIdx].classList.add('active');
+        };
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.cat;
+                renderItems();
+            });
+        });
+
+        searchInput.addEventListener('input', renderItems);
+        
+        updateUIState();
+        renderChatRooms();
+        renderChatMessages();
+    </script>
+</body>
+</html>
